@@ -1,11 +1,20 @@
 import requests
 import datetime
-from pprint import pprint
-from config import open_weather_token
+from weather_tg_bot.config import config
+from aiogram import Bot, types, Dispatcher
+from aiogram.filters import CommandStart
 
 
-def get_weather(city, open_weather_token):
+dp = Dispatcher()
 
+
+@dp.message(CommandStart())
+async def start_command(message: types.Message):
+    await message.reply("Привет! Напиши мне название города и я пришлю сводку погоды!")
+
+
+@dp.message()
+async def get_weather(message: types.Message):
     code_to_smile = {
         "Clear": "Ясно \U00002600",
         "Clouds": "Облачно \U00002601",
@@ -18,10 +27,9 @@ def get_weather(city, open_weather_token):
 
     try:
         r = requests.get(
-            f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={open_weather_token}&units=metric"
+            f"http://api.openweathermap.org/data/2.5/weather?q={message.text}&appid={config.open_weather_token}&units=metric"
         )
         data = r.json()
-        pprint(data)
 
         city = data["name"]
         cur_weather = data["main"]["temp"]
@@ -40,22 +48,18 @@ def get_weather(city, open_weather_token):
         length_of_the_day = datetime.datetime.fromtimestamp(data["sys"]["sunset"]) - datetime.datetime.fromtimestamp(
             data["sys"]["sunrise"])
 
-        print(f"***{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}***\n"
+        await message.reply(f"***{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}***\n"
               f"Погода в городе: {city}\nТемпература: {cur_weather}C° {wd}\n"
               f"Влажность: {humidity}%\nДавление: {pressure} мм.рт.ст\nВетер: {wind} м/с\n"
               f"Восход солнца: {sunrise_timestamp}\nЗакат солнца: {sunset_timestamp}\nПродолжительность дня: {length_of_the_day}\n"
-              f"Хорошего дня!"
+              f"***Хорошего дня!***"
               )
 
-    except Exception as ex:
-        print(ex)
-        print("Проверьте название города")
+    except:  # noqa: E722
+        await message.reply("\U00002620 Проверьте название города \U00002620")
 
 
-def main():
-    city = input("Введите город: ")
-    get_weather(city, open_weather_token)
-
-
-if __name__ == '__main__':
-    main()
+async def main() -> None:
+    """Запуск бота."""
+    bot = Bot(token=config.tg_bot_token)
+    await dp.start_polling(bot)
