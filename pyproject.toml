@@ -1,0 +1,7 @@
+[project]
+name = "weather-telegram-bot"
+version = "0.1.0"
+description = "Бот для получения прогноза погоды в Telegram"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
