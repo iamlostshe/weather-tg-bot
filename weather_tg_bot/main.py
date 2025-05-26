@@ -1,9 +1,10 @@
-import requests
 import datetime
-from weather_tg_bot.config import config
-from aiogram import Bot, types, Dispatcher
+
+import requests
+from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
 
+from weather_tg_bot.config import config
 
 dp = Dispatcher()
 
@@ -22,12 +23,12 @@ async def get_weather(message: types.Message):
         "Drizzle": "Дождь \U00002614",
         "Thunderstorm": "Гроза \U000026A1",
         "Snow": "Снег \U0001F328",
-        "Mist": "Туман \U0001F32B"
+        "Mist": "Туман \U0001F32B",
     }
 
     try:
         r = requests.get(
-            f"http://api.openweathermap.org/data/2.5/weather?q={message.text}&appid={config.open_weather_token}&units=metric"
+            f"http://api.openweathermap.org/data/2.5/weather?q={message.text}&appid={config.open_weather_token}&units=metric",
         )
         data = r.json()
 
@@ -52,7 +53,7 @@ async def get_weather(message: types.Message):
               f"Погода в городе: {city}\nТемпература: {cur_weather}C° {wd}\n"
               f"Влажность: {humidity}%\nДавление: {pressure} мм.рт.ст\nВетер: {wind} м/с\n"
               f"Восход солнца: {sunrise_timestamp}\nЗакат солнца: {sunset_timestamp}\nПродолжительность дня: {length_of_the_day}\n"
-              f"***Хорошего дня!***"
+              f"***Хорошего дня!***",
               )
 
     except:  # noqa: E722
