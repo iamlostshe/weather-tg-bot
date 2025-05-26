@@ -10,12 +10,12 @@ dp = Dispatcher()
 
 
 @dp.message(CommandStart())
-async def start_command(message: types.Message):
-    await message.reply("Привет! Напиши мне название города и я пришлю сводку погоды!")
+async def start_command(message: types.Message) -> None:
+    await message.answer("Привет! Напиши мне название города и я пришлю сводку погоды!")
 
 
 @dp.message()
-async def get_weather(message: types.Message):
+async def get_weather(message: types.Message) -> None:
     code_to_smile = {
         "Clear": "Ясно \U00002600",
         "Clouds": "Облачно \U00002601",
@@ -46,18 +46,26 @@ async def get_weather(message: types.Message):
         wind = data["wind"]["speed"]
         sunrise_timestamp = datetime.datetime.fromtimestamp(data["sys"]["sunrise"])
         sunset_timestamp = datetime.datetime.fromtimestamp(data["sys"]["sunset"])
-        length_of_the_day = datetime.datetime.fromtimestamp(data["sys"]["sunset"]) - datetime.datetime.fromtimestamp(
-            data["sys"]["sunrise"])
+        length_of_the_day = datetime.datetime.fromtimestamp(
+            data["sys"]["sunset"],
+        ) - datetime.datetime.fromtimestamp(
+            data["sys"]["sunrise"],
+        )
 
-        await message.reply(f"***{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}***\n"
-              f"Погода в городе: {city}\nТемпература: {cur_weather}C° {wd}\n"
-              f"Влажность: {humidity}%\nДавление: {pressure} мм.рт.ст\nВетер: {wind} м/с\n"
-              f"Восход солнца: {sunrise_timestamp}\nЗакат солнца: {sunset_timestamp}\nПродолжительность дня: {length_of_the_day}\n"
-              f"***Хорошего дня!***",
-              )
+        await message.answer(
+            f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}\n\n"
+            f"Погода в городе: {city}\n"
+            f"Температура: {cur_weather}C° {wd}\n"
+            f"Влажность: {humidity}%\n"
+            f"Давление: {pressure} мм.рт.ст\n"
+            f"Ветер: {wind} м/с\n"
+            f"Восход солнца: {sunrise_timestamp}\n"
+            f"Закат солнца: {sunset_timestamp}\n"
+            f"Продолжительность дня: {length_of_the_day}\n",
+        )
 
     except:  # noqa: E722
-        await message.reply("\U00002620 Проверьте название города \U00002620")
+        await message.answer("\U00002620 Проверьте название города \U00002620")
 
 
 async def main() -> None:
